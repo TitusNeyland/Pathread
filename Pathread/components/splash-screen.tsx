@@ -95,6 +95,8 @@ export default function SplashScreen({ onAnimationFinish }: SplashScreenProps) {
           </Animated.Text>
         ))}
       </Animated.View>
+
+      <Text style={styles.footer}>© 2025 Titus Neyland</Text>
     </View>
   );
 }
@@ -115,5 +117,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 1,
     textTransform: 'lowercase',
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 24,
+    left: 16,
+    right: 16,
+    textAlign: 'center',
+    color: '#9BA1A6',
+    opacity: 0.8,
+    fontSize: 12,
   },
 });
