@@ -11,6 +11,8 @@ export default function SignUpScreen() {
   const titleOpacity = useRef(new Animated.Value(0)).current;
   const titleScale = useRef(new Animated.Value(0.8)).current;
   const titleTranslateY = useRef(new Animated.Value(20)).current;
+  const titleFinalScale = useRef(new Animated.Value(1)).current;
+  const titleFinalTranslateY = useRef(new Animated.Value(1)).current;
   const subtitleOpacity = useRef(new Animated.Value(0)).current;
   const subtitleTranslateY = useRef(new Animated.Value(20)).current;
   const inputOpacity = useRef(new Animated.Value(0)).current;
@@ -44,6 +46,18 @@ export default function SignUpScreen() {
       setShowFullScreen(true);
       
       Animated.parallel([
+        // Animate title to final position (smaller and higher)
+        Animated.timing(titleFinalScale, {
+          toValue: 0.7,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(titleFinalTranslateY, {
+          toValue: -40,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        // Show rest of content
         Animated.timing(subtitleOpacity, {
           toValue: 1,
           duration: 600,
@@ -113,8 +127,8 @@ export default function SignUpScreen() {
             {
               opacity: titleOpacity,
               transform: [
-                { translateY: titleTranslateY },
-                { scale: titleScale }
+                { translateY: Animated.add(titleTranslateY, titleFinalTranslateY) },
+                { scale: Animated.multiply(titleScale, titleFinalScale) }
               ]
             }
           ]}
@@ -223,7 +237,7 @@ const styles = StyleSheet.create({
   },
   whoAreYou: {
     color: '#ffffff',
-    fontSize: 28,
+    fontSize: 36,
     fontWeight: '700',
     textAlign: 'center',
   },
