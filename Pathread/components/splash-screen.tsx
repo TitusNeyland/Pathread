@@ -1,14 +1,17 @@
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated, StatusBar, Text } from 'react-native';
+import { useRouter } from 'expo-router';
 
 interface SplashScreenProps {
   onAnimationFinish?: () => void;
 }
 
 export default function SplashScreen({ onAnimationFinish }: SplashScreenProps) {
+  const router = useRouter();
   const opacityAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.6)).current;
   const translateYAnim = useRef(new Animated.Value(-40)).current;
+  const exitAnim = useRef(new Animated.Value(1)).current;
 
   const title = 'pathread.';
   const letters = title.split('');
@@ -63,7 +66,14 @@ export default function SplashScreen({ onAnimationFinish }: SplashScreenProps) {
     );
 
     Animated.sequence([base, perLetter]).start(() => {
-      onAnimationFinish?.();
+      // Start exit animation before transitioning
+      Animated.timing(exitAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }).start(() => {
+        onAnimationFinish?.();
+      });
     });
   }, [opacityAnim, scaleAnim, translateYAnim, letterOpacity, letterScale, letterTranslate, letters, onAnimationFinish]);
 
@@ -73,7 +83,13 @@ export default function SplashScreen({ onAnimationFinish }: SplashScreenProps) {
       <Animated.View
         style={[
           styles.titleRow,
-          { opacity: opacityAnim, transform: [{ translateY: translateYAnim }, { scale: scaleAnim }] },
+          { 
+            opacity: Animated.multiply(opacityAnim, exitAnim), 
+            transform: [
+              { translateY: translateYAnim }, 
+              { scale: Animated.multiply(scaleAnim, exitAnim) }
+            ] 
+          },
         ]}
       >
         {letters.map((ch, i) => (
@@ -82,10 +98,10 @@ export default function SplashScreen({ onAnimationFinish }: SplashScreenProps) {
             style={[
               styles.title,
               {
-                opacity: letterOpacity[i],
+                opacity: Animated.multiply(letterOpacity[i], exitAnim),
                 transform: [
                   { translateY: letterTranslate[i] },
-                  { scale: letterScale[i] },
+                  { scale: Animated.multiply(letterScale[i], exitAnim) },
                 ],
               },
             ]}
@@ -96,7 +112,7 @@ export default function SplashScreen({ onAnimationFinish }: SplashScreenProps) {
         ))}
       </Animated.View>
 
-      <Text style={styles.footer}>© 2025 Titus Neyland</Text>
+      <Animated.Text style={[styles.footer, { opacity: exitAnim }]}>© 2025 Titus Neyland</Animated.Text>
     </View>
   );
 }
