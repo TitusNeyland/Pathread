@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, StatusBar, Platform, KeyboardAvoidingView, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 export default function LoginScreen() {
   const titleOpacity = useRef(new Animated.Value(0)).current;
@@ -124,7 +125,7 @@ export default function LoginScreen() {
         </TouchableOpacity>
 
         <Text style={styles.footerText}>
-          Not a user? <Text style={styles.link}>Sign up</Text>
+          Not a user? <Text style={styles.link} onPress={() => router.push('/signup')}>Sign up</Text>
         </Text>
       </Animated.View>
 
