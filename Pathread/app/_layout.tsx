@@ -1,5 +1,6 @@
+import React from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
@@ -7,13 +8,21 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useSplashScreen } from '@/hooks/use-splash-screen';
 import SplashScreenComponent from '@/components/splash-screen';
 
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+// Removed anchor to ensure login is the initial screen
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const { isAppReady, isSplashAnimationComplete, onSplashAnimationFinish } = useSplashScreen();
+  const router = useRouter();
+  const segments = useSegments();
+
+  // Ensure we land on /login on first load
+  React.useEffect(() => {
+    if (isAppReady && isSplashAnimationComplete) {
+      // Always navigate to login first, regardless of current route
+      router.replace('/login');
+    }
+  }, [isAppReady, isSplashAnimationComplete, router]);
 
   if (!isAppReady || !isSplashAnimationComplete) {
     return (
@@ -24,7 +33,8 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
       <StatusBar style="auto" />
