@@ -5,9 +5,12 @@ import { router } from 'expo-router';
 
 export default function SignUpScreen() {
   const [showFullScreen, setShowFullScreen] = useState(false);
+  const [currentStep, setCurrentStep] = useState('name'); // 'name' or 'birthday'
   const [firstName, setFirstName] = useState('');
+  const [month, setMonth] = useState('');
+  const [day, setDay] = useState('');
   
-  // Animation values
+  // Animation values for name step
   const titleOpacity = useRef(new Animated.Value(0)).current;
   const titleScale = useRef(new Animated.Value(0.8)).current;
   const titleTranslateY = useRef(new Animated.Value(20)).current;
@@ -19,6 +22,17 @@ export default function SignUpScreen() {
   const inputTranslateY = useRef(new Animated.Value(30)).current;
   const buttonOpacity = useRef(new Animated.Value(0)).current;
   const buttonTranslateY = useRef(new Animated.Value(30)).current;
+
+  // Animation values for birthday step
+  const birthdayTitleOpacity = useRef(new Animated.Value(0)).current;
+  const birthdayTitleScale = useRef(new Animated.Value(0.8)).current;
+  const birthdayTitleTranslateY = useRef(new Animated.Value(20)).current;
+  const birthdaySubtitleOpacity = useRef(new Animated.Value(0)).current;
+  const birthdaySubtitleTranslateY = useRef(new Animated.Value(20)).current;
+  const birthdayInputOpacity = useRef(new Animated.Value(0)).current;
+  const birthdayInputTranslateY = useRef(new Animated.Value(30)).current;
+  const birthdayButtonOpacity = useRef(new Animated.Value(0)).current;
+  const birthdayButtonTranslateY = useRef(new Animated.Value(30)).current;
 
   useEffect(() => {
     // Start with just "Who are you?" animation
@@ -99,11 +113,103 @@ export default function SignUpScreen() {
   }, []);
 
   const handleContinue = () => {
-    if (firstName.trim()) {
-      // Navigate to next screen or handle signup logic
-      console.log('First name:', firstName);
+    if (currentStep === 'name' && firstName.trim()) {
+      // Animate out the name section and in the birthday section
+      animateToBirthday();
+    } else if (currentStep === 'birthday' && month.trim() && day.trim()) {
+      // Handle birthday completion
+      console.log('Birthday:', month, day);
       // router.push('/next-screen');
     }
+  };
+
+  const animateToBirthday = () => {
+    // First, animate out the current content
+    Animated.parallel([
+      Animated.timing(titleOpacity, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(subtitleOpacity, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(inputOpacity, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonOpacity, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      // After exit animation completes, change step and animate in birthday content
+      setCurrentStep('birthday');
+      
+      // Start birthday animations
+      Animated.parallel([
+        Animated.timing(birthdayTitleOpacity, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.spring(birthdayTitleScale, {
+          toValue: 1,
+          tension: 50,
+          friction: 8,
+          useNativeDriver: true,
+        }),
+        Animated.timing(birthdayTitleTranslateY, {
+          toValue: 0,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      // After 1 second, show the rest of birthday content
+      setTimeout(() => {
+        Animated.parallel([
+          Animated.timing(birthdaySubtitleOpacity, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(birthdaySubtitleTranslateY, {
+            toValue: 0,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(birthdayInputOpacity, {
+            toValue: 1,
+            duration: 600,
+            delay: 200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(birthdayInputTranslateY, {
+            toValue: 0,
+            duration: 600,
+            delay: 200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(birthdayButtonOpacity, {
+            toValue: 1,
+            duration: 600,
+            delay: 400,
+            useNativeDriver: true,
+          }),
+          Animated.timing(birthdayButtonTranslateY, {
+            toValue: 0,
+            duration: 600,
+            delay: 400,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      }, 1000);
+    });
   };
 
   return (
@@ -120,36 +226,119 @@ export default function SignUpScreen() {
       />
 
       <View style={styles.content}>
-        {/* Title Animation */}
-        <Animated.View 
-          style={[
-            styles.titleContainer,
-            {
-              opacity: titleOpacity,
-              transform: [
-                { translateY: Animated.add(titleTranslateY, titleFinalTranslateY) },
-                { scale: Animated.multiply(titleScale, titleFinalScale) }
-              ]
-            }
-          ]}
-        >
-          <Text style={styles.whoAreYou}>Who are you?</Text>
-        </Animated.View>
-
-        {/* Rest of the screen - animated in after delay */}
-        {showFullScreen && (
+        {/* Name Step */}
+        {currentStep === 'name' && (
           <>
+            <Animated.View 
+              style={[
+                styles.titleContainer,
+                {
+                  opacity: titleOpacity,
+                  transform: [
+                    { translateY: Animated.add(titleTranslateY, titleFinalTranslateY) },
+                    { scale: Animated.multiply(titleScale, titleFinalScale) }
+                  ]
+                }
+              ]}
+            >
+              <Text style={styles.whoAreYou}>Who are you?</Text>
+            </Animated.View>
+
+            {showFullScreen && (
+              <>
+                <Animated.View 
+                  style={[
+                    styles.subtitleContainer,
+                    {
+                      opacity: subtitleOpacity,
+                      transform: [{ translateY: subtitleTranslateY }]
+                    }
+                  ]}
+                >
+                  <Text style={styles.subtitle}>
+                    Tell us your name to personalize your journey.
+                  </Text>
+                </Animated.View>
+
+                <Animated.View 
+                  style={[
+                    styles.formContainer,
+                    {
+                      opacity: inputOpacity,
+                      transform: [{ translateY: inputTranslateY }]
+                    }
+                  ]}
+                >
+                  <TextInput
+                    placeholder="First name"
+                    placeholderTextColor="#7a7f85"
+                    style={styles.input}
+                    value={firstName}
+                    onChangeText={setFirstName}
+                    autoCapitalize="words"
+                    returnKeyType="done"
+                    onSubmitEditing={handleContinue}
+                  />
+                </Animated.View>
+
+                <Animated.View 
+                  style={[
+                    styles.buttonContainer,
+                    {
+                      opacity: buttonOpacity,
+                      transform: [{ translateY: buttonTranslateY }]
+                    }
+                  ]}
+                >
+                  <TouchableOpacity 
+                    activeOpacity={0.95} 
+                    style={styles.button}
+                    onPress={handleContinue}
+                  >
+                    <LinearGradient
+                      colors={["#4A90E2", "#7B68EE"]}
+                      start={{ x: 0, y: 0.5 }}
+                      end={{ x: 1, y: 0.5 }}
+                      style={styles.buttonGradient}
+                    >
+                      <Text style={styles.buttonText}>Continue</Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </Animated.View>
+              </>
+            )}
+          </>
+        )}
+
+        {/* Birthday Step */}
+        {currentStep === 'birthday' && (
+          <>
+            <Animated.View 
+              style={[
+                styles.titleContainer,
+                {
+                  opacity: birthdayTitleOpacity,
+                  transform: [
+                    { translateY: birthdayTitleTranslateY },
+                    { scale: birthdayTitleScale }
+                  ]
+                }
+              ]}
+            >
+              <Text style={styles.birthdayQuestion}>When's your birthday?</Text>
+            </Animated.View>
+
             <Animated.View 
               style={[
                 styles.subtitleContainer,
                 {
-                  opacity: subtitleOpacity,
-                  transform: [{ translateY: subtitleTranslateY }]
+                  opacity: birthdaySubtitleOpacity,
+                  transform: [{ translateY: birthdaySubtitleTranslateY }]
                 }
               ]}
             >
               <Text style={styles.subtitle}>
-                Tell us your name to personalize your journey.
+                We'll use this to personalize your reading experience.
               </Text>
             </Animated.View>
 
@@ -157,29 +346,40 @@ export default function SignUpScreen() {
               style={[
                 styles.formContainer,
                 {
-                  opacity: inputOpacity,
-                  transform: [{ translateY: inputTranslateY }]
+                  opacity: birthdayInputOpacity,
+                  transform: [{ translateY: birthdayInputTranslateY }]
                 }
               ]}
             >
-              <TextInput
-                placeholder="First name"
-                placeholderTextColor="#7a7f85"
-                style={styles.input}
-                value={firstName}
-                onChangeText={setFirstName}
-                autoCapitalize="words"
-                returnKeyType="done"
-                onSubmitEditing={handleContinue}
-              />
+              <View style={styles.inputRow}>
+                <TextInput
+                  placeholder="Month"
+                  placeholderTextColor="#7a7f85"
+                  style={[styles.input, styles.halfInput]}
+                  value={month}
+                  onChangeText={setMonth}
+                  autoCapitalize="words"
+                  returnKeyType="next"
+                />
+                <TextInput
+                  placeholder="Day"
+                  placeholderTextColor="#7a7f85"
+                  style={[styles.input, styles.halfInput]}
+                  value={day}
+                  onChangeText={setDay}
+                  keyboardType="numeric"
+                  returnKeyType="done"
+                  onSubmitEditing={handleContinue}
+                />
+              </View>
             </Animated.View>
 
             <Animated.View 
               style={[
                 styles.buttonContainer,
                 {
-                  opacity: buttonOpacity,
-                  transform: [{ translateY: buttonTranslateY }]
+                  opacity: birthdayButtonOpacity,
+                  transform: [{ translateY: birthdayButtonTranslateY }]
                 }
               ]}
             >
@@ -241,6 +441,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
   },
+  birthdayQuestion: {
+    color: '#ffffff',
+    fontSize: 36,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
   subtitleContainer: {
     alignItems: 'center',
     marginBottom: 40,
@@ -266,6 +472,14 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     textAlign: 'center',
+  },
+  inputRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  halfInput: {
+    flex: 1,
   },
   buttonContainer: {
     width: '100%',
