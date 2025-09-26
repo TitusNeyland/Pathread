@@ -6,12 +6,24 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function SignUpScreen() {
   const [showFullScreen, setShowFullScreen] = useState(false);
-  const [currentStep, setCurrentStep] = useState('name'); // 'name' or 'birthday'
+  const [currentStep, setCurrentStep] = useState('name'); // 'name', 'birthday', 'results', or 'interests'
   const [firstName, setFirstName] = useState('');
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedDay, setSelectedDay] = useState('');
   const [showMonthModal, setShowMonthModal] = useState(false);
   const [showDayModal, setShowDayModal] = useState(false);
+  const [zodiacResult, setZodiacResult] = useState<any>(null);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+
+  // Interests data
+  const interests = [
+    'Art & Design', 'Gaming', 'Hiking', 'Exercising', 'Music',
+    'Photography', 'Cooking', 'Travel', 'Reading', 'Movies',
+    'Sports', 'Dancing', 'Writing', 'Technology', 'Nature',
+    'Fashion', 'Meditation', 'Gardening', 'Crafting', 'Astronomy',
+    'History', 'Science', 'Languages', 'Volunteering', 'Collecting',
+    'Theater', 'Comedy', 'Fitness', 'Yoga', 'Puzzles'
+  ];
 
   // Month and day options
   const months = [
@@ -160,6 +172,30 @@ export default function SignUpScreen() {
   const birthdayButtonOpacity = useRef(new Animated.Value(0)).current;
   const birthdayButtonTranslateY = useRef(new Animated.Value(30)).current;
 
+  // Animation values for results step
+  const resultsYouAreOpacity = useRef(new Animated.Value(0)).current;
+  const resultsYouAreTranslateY = useRef(new Animated.Value(20)).current;
+  const resultsIconOpacity = useRef(new Animated.Value(0)).current;
+  const resultsIconScale = useRef(new Animated.Value(0.5)).current;
+  const resultsTitleOpacity = useRef(new Animated.Value(0)).current;
+  const resultsTitleScale = useRef(new Animated.Value(0.8)).current;
+  const resultsTitleTranslateY = useRef(new Animated.Value(20)).current;
+  const resultsDescriptionOpacity = useRef(new Animated.Value(0)).current;
+  const resultsDescriptionTranslateY = useRef(new Animated.Value(30)).current;
+  const resultsButtonOpacity = useRef(new Animated.Value(0)).current;
+  const resultsButtonTranslateY = useRef(new Animated.Value(30)).current;
+
+  // Animation values for interests step
+  const interestsTitleOpacity = useRef(new Animated.Value(0)).current;
+  const interestsTitleScale = useRef(new Animated.Value(0.8)).current;
+  const interestsTitleTranslateY = useRef(new Animated.Value(20)).current;
+  const interestsSubtitleOpacity = useRef(new Animated.Value(0)).current;
+  const interestsSubtitleTranslateY = useRef(new Animated.Value(20)).current;
+  const interestsGridOpacity = useRef(new Animated.Value(0)).current;
+  const interestsGridTranslateY = useRef(new Animated.Value(30)).current;
+  const interestsButtonOpacity = useRef(new Animated.Value(0)).current;
+  const interestsButtonTranslateY = useRef(new Animated.Value(30)).current;
+
   useEffect(() => {
     // Start with just "Who are you?" animation
     Animated.parallel([
@@ -243,19 +279,27 @@ export default function SignUpScreen() {
       // Animate out the name section and in the birthday section
       animateToBirthday();
     } else if (currentStep === 'birthday' && selectedMonth && selectedDay) {
-      // Get zodiac sign and navigate to results
-      const zodiacSign = getZodiacSign(selectedMonth, selectedDay);
-      if (zodiacSign) {
-        // Navigate to results screen with user data
-        router.push({
-          pathname: '/results',
-          params: {
-            firstName: firstName,
-            zodiacData: JSON.stringify(zodiacSign)
-          }
-        });
-      }
+      // Animate out the birthday section and show results
+      animateToResults();
+    } else if (currentStep === 'results') {
+      // Animate out the results section and show interests
+      animateToInterests();
+    } else if (currentStep === 'interests' && selectedInterests.length >= 3) {
+      // Navigate to main app or next screen
+      console.log('User interests:', selectedInterests);
+      router.push('/');
     }
+  };
+
+  const toggleInterest = (interest: string) => {
+    setSelectedInterests(prev => {
+      if (prev.includes(interest)) {
+        return prev.filter(item => item !== interest);
+      } else if (prev.length < 10) {
+        return [...prev, interest];
+      }
+      return prev;
+    });
   };
 
   const animateToBirthday = () => {
@@ -344,6 +388,214 @@ export default function SignUpScreen() {
           }),
         ]).start();
       }, 1000);
+    });
+  };
+
+  const animateToResults = () => {
+    // Get zodiac sign first
+    const zodiacSign = getZodiacSign(selectedMonth, selectedDay);
+    if (!zodiacSign) return;
+
+    // Set the zodiac result
+    setZodiacResult(zodiacSign);
+
+    // Animate out the birthday content
+    Animated.parallel([
+      Animated.timing(birthdayTitleOpacity, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(birthdaySubtitleOpacity, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(birthdayInputOpacity, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(birthdayButtonOpacity, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      // After exit animation completes, change step and animate in results content
+      setCurrentStep('results');
+      
+      // Start results animations
+      Animated.sequence([
+        // First, animate "YOU ARE A"
+        Animated.parallel([
+          Animated.timing(resultsYouAreOpacity, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(resultsYouAreTranslateY, {
+            toValue: 0,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+        ]),
+        // Then animate the icon
+        Animated.parallel([
+          Animated.timing(resultsIconOpacity, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.spring(resultsIconScale, {
+            toValue: 1,
+            tension: 50,
+            friction: 8,
+            useNativeDriver: true,
+          }),
+        ]),
+        // Then animate the title
+        Animated.parallel([
+          Animated.timing(resultsTitleOpacity, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.spring(resultsTitleScale, {
+            toValue: 1,
+            tension: 50,
+            friction: 8,
+            useNativeDriver: true,
+          }),
+          Animated.timing(resultsTitleTranslateY, {
+            toValue: 0,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+        ]),
+        // Then animate the description
+        Animated.parallel([
+          Animated.timing(resultsDescriptionOpacity, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(resultsDescriptionTranslateY, {
+            toValue: 0,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+        ]),
+        // Finally animate the button
+        Animated.parallel([
+          Animated.timing(resultsButtonOpacity, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(resultsButtonTranslateY, {
+            toValue: 0,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]).start();
+    });
+  };
+
+  const animateToInterests = () => {
+    // Animate out the results content
+    Animated.parallel([
+      Animated.timing(resultsYouAreOpacity, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(resultsIconOpacity, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(resultsTitleOpacity, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(resultsDescriptionOpacity, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(resultsButtonOpacity, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      // After exit animation completes, change step and animate in interests content
+      setCurrentStep('interests');
+      
+      // Start interests animations
+      Animated.sequence([
+        // First, animate the title
+        Animated.parallel([
+          Animated.timing(interestsTitleOpacity, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.spring(interestsTitleScale, {
+            toValue: 1,
+            tension: 50,
+            friction: 8,
+            useNativeDriver: true,
+          }),
+          Animated.timing(interestsTitleTranslateY, {
+            toValue: 0,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+        ]),
+        // Then animate the subtitle
+        Animated.parallel([
+          Animated.timing(interestsSubtitleOpacity, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(interestsSubtitleTranslateY, {
+            toValue: 0,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+        ]),
+        // Then animate the grid
+        Animated.parallel([
+          Animated.timing(interestsGridOpacity, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(interestsGridTranslateY, {
+            toValue: 0,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+        ]),
+        // Finally animate the button
+        Animated.parallel([
+          Animated.timing(interestsButtonOpacity, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(interestsButtonTranslateY, {
+            toValue: 0,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]).start();
     });
   };
 
@@ -535,6 +787,204 @@ export default function SignUpScreen() {
             </Animated.View>
           </>
         )}
+
+        {/* Results Step */}
+        {currentStep === 'results' && zodiacResult && (
+          <>
+            {/* "YOU ARE A" text */}
+            <Animated.View 
+              style={[
+                styles.youAreContainer,
+                {
+                  opacity: resultsYouAreOpacity,
+                  transform: [{ translateY: resultsYouAreTranslateY }]
+                }
+              ]}
+            >
+              <Text style={styles.youAreText}>YOU ARE A</Text>
+            </Animated.View>
+
+            {/* Large Icon */}
+            <Animated.View 
+              style={[
+                styles.iconContainer,
+                {
+                  opacity: resultsIconOpacity,
+                  transform: [{ scale: resultsIconScale }]
+                }
+              ]}
+            >
+              <Text style={styles.icon}>{zodiacResult.emoji}</Text>
+            </Animated.View>
+
+            {/* Archetype Title */}
+            <Animated.View 
+              style={[
+                styles.resultsTitleContainer,
+                {
+                  opacity: resultsTitleOpacity,
+                  transform: [
+                    { translateY: resultsTitleTranslateY },
+                    { scale: resultsTitleScale }
+                  ]
+                }
+              ]}
+            >
+              <Text style={styles.resultsTitle}>{zodiacResult.name.toUpperCase()}</Text>
+            </Animated.View>
+
+            {/* Description */}
+            <Animated.View 
+              style={[
+                styles.descriptionContainer,
+                {
+                  opacity: resultsDescriptionOpacity,
+                  transform: [{ translateY: resultsDescriptionTranslateY }]
+                }
+              ]}
+            >
+              <Text style={styles.descriptionText}>
+                {zodiacResult.traits}
+              </Text>
+            </Animated.View>
+
+            {/* Continue Button */}
+            <Animated.View 
+              style={[
+                styles.buttonContainer,
+                {
+                  opacity: resultsButtonOpacity,
+                  transform: [{ translateY: resultsButtonTranslateY }]
+                }
+              ]}
+            >
+              <TouchableOpacity 
+                activeOpacity={0.95} 
+                style={styles.button}
+                onPress={handleContinue}
+              >
+                <LinearGradient
+                  colors={["#4A90E2", "#7B68EE"]}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
+                  style={styles.buttonGradient}
+                >
+                  <Text style={styles.buttonText}>Continue my journey</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </Animated.View>
+          </>
+        )}
+
+        {/* Interests Step */}
+        {currentStep === 'interests' && (
+          <>
+            {/* Title */}
+            <Animated.View 
+              style={[
+                styles.interestsTitleContainer,
+                {
+                  opacity: interestsTitleOpacity,
+                  transform: [
+                    { translateY: interestsTitleTranslateY },
+                    { scale: interestsTitleScale }
+                  ]
+                }
+              ]}
+            >
+              <Text style={styles.interestsTitle}>What are your interests?</Text>
+            </Animated.View>
+
+            {/* Subtitle */}
+            <Animated.View 
+              style={[
+                styles.interestsSubtitleContainer,
+                {
+                  opacity: interestsSubtitleOpacity,
+                  transform: [{ translateY: interestsSubtitleTranslateY }]
+                }
+              ]}
+            >
+              <Text style={styles.interestsSubtitle}>
+                Choose at least 3 and up to 10 to personalize your journey.
+              </Text>
+            </Animated.View>
+
+            {/* Interests Grid */}
+            <Animated.View 
+              style={[
+                styles.interestsGridContainer,
+                {
+                  opacity: interestsGridOpacity,
+                  transform: [{ translateY: interestsGridTranslateY }]
+                }
+              ]}
+            >
+              <ScrollView 
+                style={styles.interestsScrollView}
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+                contentContainerStyle={styles.interestsScrollContent}
+              >
+                <View style={styles.interestsGrid}>
+                  {interests.map((interest) => (
+                    <TouchableOpacity
+                      key={interest}
+                      style={[
+                        styles.interestTag,
+                        selectedInterests.includes(interest) && styles.selectedInterestTag
+                      ]}
+                      onPress={() => toggleInterest(interest)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={[
+                        styles.interestText,
+                        selectedInterests.includes(interest) && styles.selectedInterestText
+                      ]}>
+                        {interest}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView>
+            </Animated.View>
+
+            {/* Continue Button */}
+            <Animated.View 
+              style={[
+                styles.buttonContainer,
+                {
+                  opacity: interestsButtonOpacity,
+                  transform: [{ translateY: interestsButtonTranslateY }]
+                }
+              ]}
+            >
+              <TouchableOpacity 
+                activeOpacity={0.95} 
+                style={[
+                  styles.button,
+                  selectedInterests.length < 3 && styles.disabledButton
+                ]}
+                onPress={handleContinue}
+                disabled={selectedInterests.length < 3}
+              >
+                <LinearGradient
+                  colors={selectedInterests.length >= 3 ? ["#4A90E2", "#7B68EE"] : ["#666", "#666"]}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
+                  style={styles.buttonGradient}
+                >
+                  <Text style={styles.buttonText}>
+                    {selectedInterests.length < 3 
+                      ? `Choose ${3 - selectedInterests.length} more` 
+                      : 'Continue'
+                    }
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </Animated.View>
+          </>
+        )}
       </View>
 
       {/* Month Selection Modal */}
@@ -649,6 +1099,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 20,
   },
   titleContainer: {
     alignItems: 'center',
@@ -789,8 +1241,126 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '600',
   },
+  // Results step styles
+  youAreContainer: {
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  youAreText: {
+    color: '#9aa0a6',
+    fontSize: 20,
+    fontWeight: '500',
+    textAlign: 'center',
+    letterSpacing: 1,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  icon: {
+    fontSize: 100,
+    textAlign: 'center',
+    textShadowColor: '#ffa500',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 15,
+  },
+  resultsTitleContainer: {
+    alignItems: 'center',
+    marginBottom: 25,
+  },
+  resultsTitle: {
+    color: '#ffa500',
+    fontSize: 32,
+    fontWeight: '700',
+    textAlign: 'center',
+    letterSpacing: 1,
+    textShadowColor: '#ffa500',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
+  },
+  descriptionContainer: {
+    width: '100%',
+    marginBottom: 40,
+    paddingHorizontal: 20,
+  },
+  descriptionText: {
+    color: '#9aa0a6',
+    fontSize: 16,
+    lineHeight: 22,
+    textAlign: 'center',
+    fontWeight: '400',
+  },
+  // Interests step styles
+  interestsTitleContainer: {
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  interestsTitle: {
+    color: '#ffffff',
+    fontSize: 26,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  interestsSubtitleContainer: {
+    alignItems: 'center',
+    marginBottom: 24,
+    paddingHorizontal: 20,
+  },
+  interestsSubtitle: {
+    color: '#9aa0a6',
+    fontSize: 15,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  interestsGridContainer: {
+    width: '100%',
+    flex: 1,
+    marginBottom: 20,
+  },
+  interestsScrollView: {
+    flex: 1,
+  },
+  interestsScrollContent: {
+    paddingBottom: 10,
+  },
+  interestsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 10,
+  },
+  interestTag: {
+    backgroundColor: 'rgba(15,15,18,0.8)',
+    borderWidth: 1,
+    borderColor: 'rgba(120,130,150,0.3)',
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    minWidth: '30%',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  selectedInterestTag: {
+    backgroundColor: '#4A90E2',
+    borderWidth: 0,
+    overflow: 'hidden',
+  },
+  interestText: {
+    color: '#ffffff',
+    fontSize: 13,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  selectedInterestText: {
+    color: '#ffffff',
+    fontWeight: '600',
+  },
+  disabledButton: {
+    opacity: 0.6,
+  },
   buttonContainer: {
     width: '100%',
+    paddingTop: 10,
   },
   button: {
     borderRadius: 16,
