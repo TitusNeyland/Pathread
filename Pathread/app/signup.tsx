@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, StatusBar, Platform, KeyboardAvoidingView, Animated, Modal, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, StatusBar, Platform, KeyboardAvoidingView, Animated, Modal, ScrollView, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { PanGestureHandler, State, GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function SignUpScreen() {
   const [showFullScreen, setShowFullScreen] = useState(false);
@@ -300,6 +301,24 @@ export default function SignUpScreen() {
       }
       return prev;
     });
+  };
+
+  const handleSwipeDown = (event: any) => {
+    const { translationY, state } = event.nativeEvent;
+    
+    // Check if it's a downward swipe gesture (translationY > 50) and gesture is ending
+    if (state === State.END && translationY > 50) {
+      Keyboard.dismiss();
+    }
+  };
+
+  const handleModalOverlayPress = (modalType: 'month' | 'day') => {
+    Keyboard.dismiss();
+    if (modalType === 'month') {
+      setShowMonthModal(false);
+    } else if (modalType === 'day') {
+      setShowDayModal(false);
+    }
   };
 
   const animateToBirthday = () => {
@@ -600,19 +619,21 @@ export default function SignUpScreen() {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior={Platform.select({ ios: 'padding', default: undefined })}>
-      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+    <GestureHandlerRootView style={styles.container}>
+      <KeyboardAvoidingView style={styles.container} behavior={Platform.select({ ios: 'padding', default: undefined })}>
+        <StatusBar barStyle="light-content" backgroundColor="#000000" />
 
-      {/* Full-screen animated gradient background */}
-      <LinearGradient
-        colors={["rgba(78, 84, 200, 0.25)", "rgba(143, 148, 251, 0.10)", 'rgba(0,0,0,0.6)']}
-        start={{ x: 0.1, y: 0 }}
-        end={{ x: 0.9, y: 1 }}
-        style={styles.bgGradient}
-        pointerEvents="none"
-      />
+        {/* Full-screen animated gradient background */}
+        <LinearGradient
+          colors={["rgba(78, 84, 200, 0.25)", "rgba(143, 148, 251, 0.10)", 'rgba(0,0,0,0.6)']}
+          start={{ x: 0.1, y: 0 }}
+          end={{ x: 0.9, y: 1 }}
+          style={styles.bgGradient}
+          pointerEvents="none"
+        />
 
-      <View style={styles.content}>
+        <PanGestureHandler onHandlerStateChange={handleSwipeDown}>
+          <View style={styles.content}>
         {/* Name Step */}
         {currentStep === 'name' && (
           <>
@@ -985,7 +1006,8 @@ export default function SignUpScreen() {
             </Animated.View>
           </>
         )}
-      </View>
+        </View>
+      </PanGestureHandler>
 
       {/* Month Selection Modal */}
       <Modal
@@ -994,8 +1016,10 @@ export default function SignUpScreen() {
         animationType="slide"
         onRequestClose={() => setShowMonthModal(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+        <TouchableWithoutFeedback onPress={() => handleModalOverlayPress('month')}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Select Month</Text>
             <ScrollView 
               style={styles.modalScrollView}
@@ -1029,8 +1053,10 @@ export default function SignUpScreen() {
             >
               <Text style={styles.modalCancelText}>Cancel</Text>
             </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
 
       {/* Day Selection Modal */}
@@ -1040,8 +1066,10 @@ export default function SignUpScreen() {
         animationType="slide"
         onRequestClose={() => setShowDayModal(false)}
       >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+        <TouchableWithoutFeedback onPress={() => handleModalOverlayPress('day')}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Select Day</Text>
             <ScrollView 
               style={styles.modalScrollView}
@@ -1075,10 +1103,13 @@ export default function SignUpScreen() {
             >
               <Text style={styles.modalCancelText}>Cancel</Text>
             </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </GestureHandlerRootView>
   );
 }
 
