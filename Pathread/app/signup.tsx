@@ -1,14 +1,140 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, StatusBar, Platform, KeyboardAvoidingView, Animated } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, StatusBar, Platform, KeyboardAvoidingView, Animated, Modal, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function SignUpScreen() {
   const [showFullScreen, setShowFullScreen] = useState(false);
   const [currentStep, setCurrentStep] = useState('name'); // 'name' or 'birthday'
   const [firstName, setFirstName] = useState('');
-  const [month, setMonth] = useState('');
-  const [day, setDay] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState('');
+  const [selectedDay, setSelectedDay] = useState('');
+  const [showMonthModal, setShowMonthModal] = useState(false);
+  const [showDayModal, setShowDayModal] = useState(false);
+
+  // Month and day options
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  
+  const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString());
+
+  // Zodiac data
+  const zodiacSigns = {
+    'Aries': {
+      emoji: '🔥',
+      name: 'Flamebearer',
+      traits: 'Bold, adventurous, energetic, pioneering.',
+      archetype: 'The Hero who sparks journeys.',
+      dateRange: { start: { month: 3, day: 21 }, end: { month: 4, day: 19 } }
+    },
+    'Taurus': {
+      emoji: '🌿',
+      name: 'Earthwarden',
+      traits: 'Steadfast, patient, sensual, grounded.',
+      archetype: 'The Guardian of comfort and stability.',
+      dateRange: { start: { month: 4, day: 20 }, end: { month: 5, day: 20 } }
+    },
+    'Gemini': {
+      emoji: '🌬',
+      name: 'Twinweaver',
+      traits: 'Curious, witty, adaptable, sociable.',
+      archetype: 'The Trickster who thrives on duality.',
+      dateRange: { start: { month: 5, day: 21 }, end: { month: 6, day: 20 } }
+    },
+    'Cancer': {
+      emoji: '🌊',
+      name: 'Tidekeeper',
+      traits: 'Nurturing, emotional, intuitive, protective.',
+      archetype: 'The Healer or Caretaker of stories.',
+      dateRange: { start: { month: 6, day: 21 }, end: { month: 7, day: 22 } }
+    },
+    'Leo': {
+      emoji: '☀️',
+      name: 'Sunforged',
+      traits: 'Confident, radiant, expressive, loyal.',
+      archetype: 'The Performer who commands the stage.',
+      dateRange: { start: { month: 7, day: 23 }, end: { month: 8, day: 22 } }
+    },
+    'Virgo': {
+      emoji: '🌾',
+      name: 'Quillwright',
+      traits: 'Analytical, detail-oriented, practical, helpful.',
+      archetype: 'The Scholar or Scribe who perfects the tale.',
+      dateRange: { start: { month: 8, day: 23 }, end: { month: 9, day: 22 } }
+    },
+    'Libra': {
+      emoji: '⚖️',
+      name: 'Balanceseeker',
+      traits: 'Harmonious, diplomatic, aesthetic, fair.',
+      archetype: 'The Mediator who restores balance.',
+      dateRange: { start: { month: 9, day: 23 }, end: { month: 10, day: 22 } }
+    },
+    'Scorpio': {
+      emoji: '🦂',
+      name: 'Veilbreaker',
+      traits: 'Intense, transformative, passionate, mysterious.',
+      archetype: 'The Rebel who uncovers hidden truths.',
+      dateRange: { start: { month: 10, day: 23 }, end: { month: 11, day: 21 } }
+    },
+    'Sagittarius': {
+      emoji: '🌌',
+      name: 'Pathwanderer',
+      traits: 'Adventurous, philosophical, optimistic, free-spirited.',
+      archetype: 'The Explorer in search of wisdom.',
+      dateRange: { start: { month: 11, day: 22 }, end: { month: 12, day: 21 } }
+    },
+    'Capricorn': {
+      emoji: '🪨',
+      name: 'Stonebound',
+      traits: 'Disciplined, ambitious, responsible, determined.',
+      archetype: 'The Builder who creates lasting legacies.',
+      dateRange: { start: { month: 12, day: 22 }, end: { month: 1, day: 19 } }
+    },
+    'Aquarius': {
+      emoji: '🌠',
+      name: 'Starborn',
+      traits: 'Visionary, unconventional, humanitarian, innovative.',
+      archetype: 'The Dreamer who imagines new worlds.',
+      dateRange: { start: { month: 1, day: 20 }, end: { month: 2, day: 18 } }
+    },
+    'Pisces': {
+      emoji: '🌙',
+      name: 'Dreamtide',
+      traits: 'Compassionate, imaginative, spiritual, empathetic.',
+      archetype: 'The Mystic who swims in stories and symbols.',
+      dateRange: { start: { month: 2, day: 19 }, end: { month: 3, day: 20 } }
+    }
+  };
+
+  // Function to determine zodiac sign
+  const getZodiacSign = (month: string, day: string) => {
+    const monthNum = months.indexOf(month) + 1;
+    const dayNum = parseInt(day);
+    
+    for (const [signName, signData] of Object.entries(zodiacSigns)) {
+      const { start, end } = signData.dateRange;
+      
+      // Handle Capricorn (spans across year)
+      if (start.month === 12 && end.month === 1) {
+        if ((monthNum === 12 && dayNum >= start.day) || (monthNum === 1 && dayNum <= end.day)) {
+          return { signName, ...signData };
+        }
+      } else {
+        // Regular signs
+        if (monthNum === start.month && dayNum >= start.day) {
+          return { signName, ...signData };
+        }
+        if (monthNum === end.month && dayNum <= end.day) {
+          return { signName, ...signData };
+        }
+      }
+    }
+    
+    return null;
+  };
   
   // Animation values for name step
   const titleOpacity = useRef(new Animated.Value(0)).current;
@@ -116,10 +242,19 @@ export default function SignUpScreen() {
     if (currentStep === 'name' && firstName.trim()) {
       // Animate out the name section and in the birthday section
       animateToBirthday();
-    } else if (currentStep === 'birthday' && month.trim() && day.trim()) {
-      // Handle birthday completion
-      console.log('Birthday:', month, day);
-      // router.push('/next-screen');
+    } else if (currentStep === 'birthday' && selectedMonth && selectedDay) {
+      // Get zodiac sign and navigate to results
+      const zodiacSign = getZodiacSign(selectedMonth, selectedDay);
+      if (zodiacSign) {
+        // Navigate to results screen with user data
+        router.push({
+          pathname: '/results',
+          params: {
+            firstName: firstName,
+            zodiacData: JSON.stringify(zodiacSign)
+          }
+        });
+      }
     }
   };
 
@@ -352,25 +487,25 @@ export default function SignUpScreen() {
               ]}
             >
               <View style={styles.inputRow}>
-                <TextInput
-                  placeholder="Month"
-                  placeholderTextColor="#7a7f85"
-                  style={[styles.input, styles.halfInput]}
-                  value={month}
-                  onChangeText={setMonth}
-                  autoCapitalize="words"
-                  returnKeyType="next"
-                />
-                <TextInput
-                  placeholder="Day"
-                  placeholderTextColor="#7a7f85"
-                  style={[styles.input, styles.halfInput]}
-                  value={day}
-                  onChangeText={setDay}
-                  keyboardType="numeric"
-                  returnKeyType="done"
-                  onSubmitEditing={handleContinue}
-                />
+                <TouchableOpacity 
+                  style={[styles.dropdownButton, styles.halfInput]}
+                  onPress={() => setShowMonthModal(true)}
+                >
+                  <Text style={[styles.dropdownText, !selectedMonth && styles.placeholderText]}>
+                    {selectedMonth || 'Month'}
+                  </Text>
+                  <Ionicons name="chevron-down" size={20} color="#7a7f85" />
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={[styles.dropdownButton, styles.halfInput]}
+                  onPress={() => setShowDayModal(true)}
+                >
+                  <Text style={[styles.dropdownText, !selectedDay && styles.placeholderText]}>
+                    {selectedDay || 'Day'}
+                  </Text>
+                  <Ionicons name="chevron-down" size={20} color="#7a7f85" />
+                </TouchableOpacity>
               </View>
             </Animated.View>
 
@@ -401,6 +536,98 @@ export default function SignUpScreen() {
           </>
         )}
       </View>
+
+      {/* Month Selection Modal */}
+      <Modal
+        visible={showMonthModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowMonthModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Month</Text>
+            <ScrollView 
+              style={styles.modalScrollView}
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+            >
+              {months.map((month) => (
+                <TouchableOpacity
+                  key={month}
+                  style={[
+                    styles.modalOption,
+                    selectedMonth === month && styles.selectedOption
+                  ]}
+                  onPress={() => {
+                    setSelectedMonth(month);
+                    setShowMonthModal(false);
+                  }}
+                >
+                  <Text style={[
+                    styles.modalOptionText,
+                    selectedMonth === month && styles.selectedOptionText
+                  ]}>
+                    {month}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <TouchableOpacity
+              style={styles.modalCancel}
+              onPress={() => setShowMonthModal(false)}
+            >
+              <Text style={styles.modalCancelText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Day Selection Modal */}
+      <Modal
+        visible={showDayModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowDayModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Day</Text>
+            <ScrollView 
+              style={styles.modalScrollView}
+              showsVerticalScrollIndicator={false}
+              bounces={false}
+            >
+              {days.map((day) => (
+                <TouchableOpacity
+                  key={day}
+                  style={[
+                    styles.modalOption,
+                    selectedDay === day && styles.selectedOption
+                  ]}
+                  onPress={() => {
+                    setSelectedDay(day);
+                    setShowDayModal(false);
+                  }}
+                >
+                  <Text style={[
+                    styles.modalOptionText,
+                    selectedDay === day && styles.selectedOptionText
+                  ]}>
+                    {day}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <TouchableOpacity
+              style={styles.modalCancel}
+              onPress={() => setShowDayModal(false)}
+            >
+              <Text style={styles.modalCancelText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </KeyboardAvoidingView>
   );
 }
@@ -480,6 +707,87 @@ const styles = StyleSheet.create({
   },
   halfInput: {
     flex: 1,
+  },
+  dropdownButton: {
+    backgroundColor: 'rgba(15,15,18,0.8)',
+    borderWidth: 1,
+    borderColor: 'rgba(120,130,150,0.3)',
+    borderRadius: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 18,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 56,
+  },
+  dropdownText: {
+    color: '#ffffff',
+    fontSize: 16,
+  },
+  placeholderText: {
+    color: '#7a7f85',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'rgba(15,15,18,0.98)',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    width: '100%',
+    maxHeight: '60%',
+    borderWidth: 1,
+    borderColor: 'rgba(120,130,150,0.3)',
+    borderBottomWidth: 0,
+  },
+  modalTitle: {
+    color: '#ffffff',
+    fontSize: 20,
+    fontWeight: '700',
+    textAlign: 'center',
+    paddingVertical: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(120,130,150,0.2)',
+  },
+  modalScrollView: {
+    maxHeight: 300,
+  },
+  modalOption: {
+    paddingVertical: 18,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(120,130,150,0.1)',
+  },
+  selectedOption: {
+    backgroundColor: 'rgba(74, 144, 226, 0.2)',
+  },
+  modalOptionText: {
+    color: '#ffffff',
+    fontSize: 16,
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+  selectedOptionText: {
+    color: '#4A90E2',
+    fontWeight: '600',
+  },
+  modalCancel: {
+    marginTop: 10,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    backgroundColor: 'rgba(120,130,150,0.2)',
+    borderRadius: 12,
+  },
+  modalCancelText: {
+    color: '#9aa0a6',
+    fontSize: 16,
+    textAlign: 'center',
+    fontWeight: '600',
   },
   buttonContainer: {
     width: '100%',
