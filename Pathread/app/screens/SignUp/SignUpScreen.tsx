@@ -35,6 +35,7 @@ export default function SignUpScreen() {
   const [showDayModal, setShowDayModal] = useState(false);
   const [zodiacResult, setZodiacResult] = useState<ZodiacResult | null>(null);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [zodiacSign, setZodiacSign] = useState<string>('');
 
   // Animation hooks
   const nameAnim = useNameStepAnimations();
@@ -90,10 +91,11 @@ export default function SignUpScreen() {
       birthdayAnim.enter();
     } else if (currentStep === 'birthday' && selectedMonth && selectedDay) {
       // Animate out the birthday section and show results
-      const zodiacSign = getZodiacSign(selectedMonth, selectedDay, MONTHS);
-      if (!zodiacSign) return;
+      const zodiacData = getZodiacSign(selectedMonth, selectedDay, MONTHS);
+      if (!zodiacData) return;
 
-      setZodiacResult(zodiacSign);
+      setZodiacSign(zodiacData.signName);
+      setZodiacResult(zodiacData);
       await birthdayAnim.exit();
       setCurrentStep('results');
       resultsAnim.enter();
@@ -102,9 +104,15 @@ export default function SignUpScreen() {
       setCurrentStep('interests');
       interestsAnim.enter();
     } else if (currentStep === 'interests' && selectedInterests.length >= 3) {
-      // Navigate to main app or next screen
-      console.log('User interests:', selectedInterests);
-      router.push('/');
+      // Navigate to character screen with user data
+      router.push({
+        pathname: '/character',
+        params: {
+          zodiacSign,
+          interests: JSON.stringify(selectedInterests),
+          firstName
+        }
+      });
     }
   };
 
