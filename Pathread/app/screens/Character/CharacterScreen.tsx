@@ -45,8 +45,8 @@ export default function CharacterScreen() {
   };
 
   const handleBeginJourney = () => {
-    // Navigate to the main app
-    router.push('/');
+    // Navigate to the home screen
+    router.push('/home');
   };
 
   if (isLoading) {
