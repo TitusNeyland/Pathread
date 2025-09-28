@@ -17,7 +17,6 @@ export const signUpStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 24,
-    paddingTop: 20,
     paddingBottom: 20,
   },
   titleContainer: {

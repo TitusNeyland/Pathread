@@ -4,7 +4,7 @@ import { homeStyles as styles } from '../styles/home.styles';
 
 type StoryCardProps = {
   title: string;
-  image?: string;
+  image?: string | any;
   onPress?: () => void;
   size?: 'small' | 'large';
   isMain?: boolean;
@@ -34,13 +34,10 @@ export function StoryCard({
         onPress={handlePress}
         activeOpacity={0.8}
       >
-        {image ? (
-          <Image source={{ uri: image }} style={{ width: '100%', height: '100%', resizeMode: 'cover' }} />
-        ) : (
-          <View style={styles.placeholderImage}>
-            <Text style={styles.placeholderText}>Continue Your Story</Text>
-          </View>
-        )}
+        <Image 
+          source={require('../../../../assets/images/story-cards/continuestory.png')} 
+          style={{ width: '100%', height: '100%', resizeMode: 'cover' }} 
+        />
         <View style={styles.mainStoryOverlay}>
           <Text style={styles.mainStoryText} numberOfLines={0}>
             {title.split('\n').map((line, index) => (
@@ -62,13 +59,10 @@ export function StoryCard({
         onPress={handlePress}
         activeOpacity={0.8}
       >
-        {image ? (
-          <Image source={{ uri: image }} style={{ width: '100%', height: '100%', resizeMode: 'cover' }} />
-        ) : (
-          <View style={styles.placeholderImage}>
-            <Text style={styles.placeholderText}>Previous Story</Text>
-          </View>
-        )}
+        <Image 
+          source={require('../../../../assets/images/story-cards/orangemountains.png')} 
+          style={{ width: '100%', height: '100%', resizeMode: 'cover' }} 
+        />
         <View style={styles.previousStoryOverlay}>
           <Text style={styles.previousStoryText} numberOfLines={0}>
             {title.split('\n').map((line, index) => (
@@ -90,13 +84,10 @@ export function StoryCard({
         onPress={handlePress}
         activeOpacity={0.8}
       >
-        {image ? (
-          <Image source={{ uri: image }} style={{ width: '100%', height: '100%', resizeMode: 'cover' }} />
-        ) : (
-          <View style={styles.placeholderImage}>
-            <Text style={styles.placeholderText}>New Story</Text>
-          </View>
-        )}
+        <Image 
+          source={require('../../../../assets/images/story-cards/newstory.png')} 
+          style={{ width: '100%', height: '100%', resizeMode: 'cover' }} 
+        />
         <View style={styles.newStoryOverlay}>
           <Text style={styles.newStoryText} numberOfLines={0}>
             {title.split('\n').map((line, index) => (
@@ -118,7 +109,10 @@ export function StoryCard({
       activeOpacity={0.8}
     >
       {image ? (
-        <Image source={{ uri: image }} style={{ width: '100%', height: '100%', resizeMode: 'cover' }} />
+        <Image 
+          source={typeof image === 'string' ? { uri: image } : image} 
+          style={{ width: '100%', height: '100%', resizeMode: 'cover' }} 
+        />
       ) : (
         <View style={styles.placeholderImage}>
           <Text style={styles.placeholderText}>Story</Text>

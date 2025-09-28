@@ -3,6 +3,7 @@ import { View, StatusBar, Platform, KeyboardAvoidingView, Keyboard } from 'react
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { PanGestureHandler, State, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { signUpStyles as styles } from './styles/signUp.styles';
 import { NameStep } from './components/NameStep';
 import { BirthdayStep } from './components/BirthdayStep';
@@ -26,6 +27,7 @@ type ZodiacResult = {
 };
 
 export default function SignUpScreen() {
+  const insets = useSafeAreaInsets();
   const [currentStep, setCurrentStep] = useState<Step>('name');
   const [showFullScreen, setShowFullScreen] = useState(false);
   const [firstName, setFirstName] = useState('');
@@ -131,7 +133,7 @@ export default function SignUpScreen() {
         />
 
         <PanGestureHandler onHandlerStateChange={handleSwipeDown}>
-          <View style={styles.content}>
+          <View style={[styles.content, { paddingTop: insets.top + 20 }]}>
             {/* Name Step */}
             {currentStep === 'name' && (
               <NameStep
