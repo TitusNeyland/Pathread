@@ -153,13 +153,25 @@ export default function HomeScreen() {
             bounces={true}
             scrollEventThrottle={16}
           >
-            {continueReadingStories.map((story) => (
-              <StoryCard
-                key={story.id}
-                title={story.title}
-                onPress={() => handleStoryPress(story.title)}
-              />
-            ))}
+            {continueReadingStories.map((story, index) => {
+              let imageSource;
+              if (index === 0) {
+                imageSource = require('../../../assets/images/story-cards/continuereading.png');
+              } else if (index === 1) {
+                imageSource = require('../../../assets/images/story-cards/continuereading2.png');
+              } else if (index === 2) {
+                imageSource = require('../../../assets/images/story-cards/continuereading3.png');
+              }
+              
+              return (
+                <StoryCard
+                  key={story.id}
+                  title={story.title}
+                  onPress={() => handleStoryPress(story.title)}
+                  image={imageSource}
+                />
+              );
+            })}
           </ScrollView>
         </View>
 
@@ -178,13 +190,29 @@ export default function HomeScreen() {
             bounces={true}
             scrollEventThrottle={16}
           >
-            {otherStories.map((story) => (
-              <StoryCard
-                key={story.id}
-                title={story.title}
-                onPress={() => handleStoryPress(story.title)}
-              />
-            ))}
+            {otherStories.map((story, index) => {
+              let imageSource;
+              if (index === 0) {
+                imageSource = require('../../../assets/images/story-cards/story1.png');
+              } else if (index === 1) {
+                imageSource = require('../../../assets/images/story-cards/story2.png');
+              } else if (index === 2) {
+                imageSource = require('../../../assets/images/story-cards/lovestory.png');
+              } else if (story.title === 'Mystery Tale') {
+                imageSource = require('../../../assets/images/story-cards/mystical.png');
+              } else if (story.title === 'Fantasy Quest') {
+                imageSource = require('../../../assets/images/story-cards/fantasy.png');
+              }
+              
+              return (
+                <StoryCard
+                  key={story.id}
+                  title={story.title}
+                  onPress={() => handleStoryPress(story.title)}
+                  image={imageSource}
+                />
+              );
+            })}
           </ScrollView>
         </View>
 
@@ -203,13 +231,29 @@ export default function HomeScreen() {
             bounces={true}
             scrollEventThrottle={16}
           >
-            {popularStories.map((story) => (
-              <StoryCard
-                key={story.id}
-                title={story.title}
-                onPress={() => handleStoryPress(story.title)}
-              />
-            ))}
+            {popularStories.map((story, index) => {
+              let imageSource;
+              if (index === 0) {
+                imageSource = require('../../../assets/images/story-cards/ex1.png');
+              } else if (index === 1) {
+                imageSource = require('../../../assets/images/story-cards/ex2.png');
+              } else if (index === 2) {
+                imageSource = require('../../../assets/images/story-cards/ex3.png');
+              } else if (story.title === 'Ocean Depths') {
+                imageSource = require('../../../assets/images/story-cards/ocean.png');
+              } else if (story.title === 'City Lights') {
+                imageSource = require('../../../assets/images/story-cards/citylights.png');
+              }
+              
+              return (
+                <StoryCard
+                  key={story.id}
+                  title={story.title}
+                  onPress={() => handleStoryPress(story.title)}
+                  image={imageSource}
+                />
+              );
+            })}
           </ScrollView>
         </View>
 
