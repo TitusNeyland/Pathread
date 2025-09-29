@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StatusBar, Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, StatusBar, Platform, KeyboardAvoidingView, ScrollView, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import { PanGestureHandler, State, GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -14,6 +14,17 @@ export default function CharacterScreen() {
   }>();
   const [characterBio, setCharacterBio] = useState<CharacterBio | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Animation values
+  const titleOpacity = useRef(new Animated.Value(0)).current;
+  const titleTranslateY = useRef(new Animated.Value(30)).current;
+  const subtitleOpacity = useRef(new Animated.Value(0)).current;
+  const subtitleTranslateY = useRef(new Animated.Value(20)).current;
+  const cardOpacity = useRef(new Animated.Value(0)).current;
+  const cardScale = useRef(new Animated.Value(0.8)).current;
+  const cardTranslateY = useRef(new Animated.Value(40)).current;
+  const buttonOpacity = useRef(new Animated.Value(0)).current;
+  const buttonTranslateY = useRef(new Animated.Value(20)).current;
 
   useEffect(() => {
     // Simulate AI generation time
@@ -35,6 +46,83 @@ export default function CharacterScreen() {
 
     generateBio();
   }, [zodiacSign, interests, firstName]);
+
+  // Animation effect when character bio loads
+  useEffect(() => {
+    if (characterBio && !isLoading) {
+      // Reset all animations
+      titleOpacity.setValue(0);
+      titleTranslateY.setValue(30);
+      subtitleOpacity.setValue(0);
+      subtitleTranslateY.setValue(20);
+      cardOpacity.setValue(0);
+      cardScale.setValue(0.8);
+      cardTranslateY.setValue(40);
+      buttonOpacity.setValue(0);
+      buttonTranslateY.setValue(20);
+
+      // Animate elements in sequence
+      Animated.sequence([
+        // Title animation
+        Animated.parallel([
+          Animated.timing(titleOpacity, {
+            toValue: 1,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+          Animated.timing(titleTranslateY, {
+            toValue: 0,
+            duration: 600,
+            useNativeDriver: true,
+          }),
+        ]),
+        // Subtitle animation
+        Animated.parallel([
+          Animated.timing(subtitleOpacity, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(subtitleTranslateY, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+        ]),
+        // Card animation
+        Animated.parallel([
+          Animated.timing(cardOpacity, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(cardScale, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(cardTranslateY, {
+            toValue: 0,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+        ]),
+        // Button animation
+        Animated.parallel([
+          Animated.timing(buttonOpacity, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(buttonTranslateY, {
+            toValue: 0,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]).start();
+    }
+  }, [characterBio, isLoading]);
 
   const handleSwipeDown = (event: any) => {
     const { translationY, state } = event.nativeEvent;
@@ -94,11 +182,38 @@ export default function CharacterScreen() {
           bounces={false}
         >
           {/* Title */}
-          <Text style={styles.title}>Meet your character</Text>
-          <Text style={styles.subtitle}>Here's who you are in the world of Pathread</Text>
+          <Animated.View
+            style={{
+              opacity: titleOpacity,
+              transform: [{ translateY: titleTranslateY }],
+            }}
+          >
+            <Text style={styles.title}>Meet your character</Text>
+          </Animated.View>
+
+          {/* Subtitle */}
+          <Animated.View
+            style={{
+              opacity: subtitleOpacity,
+              transform: [{ translateY: subtitleTranslateY }],
+            }}
+          >
+            <Text style={styles.subtitle}>Here's who you are in the world of Pathread</Text>
+          </Animated.View>
 
           {/* Character Card */}
-          <View style={styles.characterCard}>
+          <Animated.View 
+            style={[
+              styles.characterCard,
+              {
+                opacity: cardOpacity,
+                transform: [
+                  { scale: cardScale },
+                  { translateY: cardTranslateY }
+                ],
+              }
+            ]}
+          >
             {/* Icon */}
             <View style={styles.iconContainer}>
               <Text style={styles.icon}>🌙</Text>
@@ -132,7 +247,15 @@ export default function CharacterScreen() {
             <Text style={styles.backstory}>{characterBio.backstory}</Text>
 
             {/* Begin Journey Button */}
-            <View style={styles.buttonContainer}>
+            <Animated.View 
+              style={[
+                styles.buttonContainer,
+                {
+                  opacity: buttonOpacity,
+                  transform: [{ translateY: buttonTranslateY }],
+                }
+              ]}
+            >
               <TouchableOpacity 
                 activeOpacity={0.95} 
                 style={styles.button}
@@ -147,8 +270,8 @@ export default function CharacterScreen() {
                   <Text style={styles.buttonText}>Begin your journey</Text>
                 </LinearGradient>
               </TouchableOpacity>
-            </View>
-          </View>
+            </Animated.View>
+          </Animated.View>
         </ScrollView>
       </PanGestureHandler>
     </GestureHandlerRootView>

@@ -4,6 +4,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Animated } from 'react-native';
 import { signUpStyles as styles } from '../styles/signUp.styles';
 
+// Helper function to determine the correct article
+const getArticle = (characterName: string): string => {
+  const firstLetter = characterName.toLowerCase().charAt(0);
+  const vowels = ['a', 'e', 'i', 'o', 'u'];
+  
+  // Check if the first letter is a vowel
+  if (vowels.includes(firstLetter)) {
+    return 'AN';
+  }
+  
+  return 'A';
+};
+
 type ZodiacResult = {
   signName: string;
   emoji: string;
@@ -57,7 +70,7 @@ export function ResultsStep({
           }
         ]}
       >
-        <Text style={styles.youAreText}>YOU ARE A</Text>
+        <Text style={styles.youAreText}>YOU ARE {getArticle(zodiacResult.name)}</Text>
       </Animated.View>
 
       {/* Large Icon */}
