@@ -14,7 +14,7 @@ export const homeStyles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 60,
+    paddingTop: 100,
     paddingBottom: 20,
   },
 
@@ -24,7 +24,7 @@ export const homeStyles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     paddingHorizontal: 24,
-    marginBottom: 32,
+    marginBottom: 40,
   },
   welcomeContainer: {
     flex: 1,
