@@ -1,11 +1,20 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StatusBar } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, ScrollView, StatusBar, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { homeStyles as styles } from './styles/home.styles';
 import { StoryCard } from './components/StoryCard';
 
 export default function HomeScreen() {
+  // Animation values
+  const headerOpacity = useRef(new Animated.Value(0)).current;
+  const headerTranslateY = useRef(new Animated.Value(-30)).current;
+  const mainSectionOpacity = useRef(new Animated.Value(0)).current;
+  const mainSectionScale = useRef(new Animated.Value(0.9)).current;
+  const mainSectionTranslateY = useRef(new Animated.Value(40)).current;
+  const sectionsOpacity = useRef(new Animated.Value(0)).current;
+  const sectionsTranslateY = useRef(new Animated.Value(30)).current;
+
   const handleStoryPress = (storyTitle: string) => {
     console.log(`Opening story: ${storyTitle}`);
     // TODO: Navigate to story reader
@@ -74,6 +83,66 @@ export default function HomeScreen() {
     { title: 'Keep Reading', id: '33' },
   ];
 
+  // Animation effect when component mounts
+  useEffect(() => {
+    // Reset all animations
+    headerOpacity.setValue(0);
+    headerTranslateY.setValue(-30);
+    mainSectionOpacity.setValue(0);
+    mainSectionScale.setValue(0.9);
+    mainSectionTranslateY.setValue(40);
+    sectionsOpacity.setValue(0);
+    sectionsTranslateY.setValue(30);
+
+    // Animate elements in sequence
+    Animated.sequence([
+      // Header animation
+      Animated.parallel([
+        Animated.timing(headerOpacity, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(headerTranslateY, {
+          toValue: 0,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Main section animation
+      Animated.parallel([
+        Animated.timing(mainSectionOpacity, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(mainSectionScale, {
+          toValue: 1,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(mainSectionTranslateY, {
+          toValue: 0,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Sections animation
+      Animated.parallel([
+        Animated.timing(sectionsOpacity, {
+          toValue: 1,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+        Animated.timing(sectionsTranslateY, {
+          toValue: 0,
+          duration: 600,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+  }, []);
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#000000" />
@@ -92,7 +161,15 @@ export default function HomeScreen() {
         bounces={true}
       >
         {/* Header */}
-        <View style={styles.header}>
+        <Animated.View 
+          style={[
+            styles.header,
+            {
+              opacity: headerOpacity,
+              transform: [{ translateY: headerTranslateY }],
+            }
+          ]}
+        >
           <View style={styles.welcomeContainer}>
             <Text style={styles.welcomeText}>Welcome back,</Text>
             <Text style={styles.userName}>Titus</Text>
@@ -104,10 +181,21 @@ export default function HomeScreen() {
           >
             <Ionicons name="person-outline" size={20} color="#ffffff" />
           </TouchableOpacity>
-        </View>
+        </Animated.View>
 
         {/* Continue Story / Previous Story / Begin New Story Section */}
-        <View style={styles.continueSection}>
+        <Animated.View 
+          style={[
+            styles.continueSection,
+            {
+              opacity: mainSectionOpacity,
+              transform: [
+                { scale: mainSectionScale },
+                { translateY: mainSectionTranslateY }
+              ],
+            }
+          ]}
+        >
           <ScrollView 
             horizontal 
             showsHorizontalScrollIndicator={false}
@@ -136,10 +224,18 @@ export default function HomeScreen() {
               isNewStory={true}
             />
           </ScrollView>
-        </View>
+        </Animated.View>
 
         {/* Continue Reading Section */}
-        <View style={styles.section}>
+        <Animated.View 
+          style={[
+            styles.section,
+            {
+              opacity: sectionsOpacity,
+              transform: [{ translateY: sectionsTranslateY }],
+            }
+          ]}
+        >
           <Text style={styles.sectionTitle}>CONTINUE READING</Text>
           <ScrollView 
             horizontal 
@@ -173,10 +269,18 @@ export default function HomeScreen() {
               );
             })}
           </ScrollView>
-        </View>
+        </Animated.View>
 
         {/* Read Other Stories Section */}
-        <View style={styles.section}>
+        <Animated.View 
+          style={[
+            styles.section,
+            {
+              opacity: sectionsOpacity,
+              transform: [{ translateY: sectionsTranslateY }],
+            }
+          ]}
+        >
           <Text style={styles.sectionTitle}>READ OTHER STORIES</Text>
           <ScrollView 
             horizontal 
@@ -214,10 +318,18 @@ export default function HomeScreen() {
               );
             })}
           </ScrollView>
-        </View>
+        </Animated.View>
 
         {/* Popular Stories Section */}
-        <View style={styles.section}>
+        <Animated.View 
+          style={[
+            styles.section,
+            {
+              opacity: sectionsOpacity,
+              transform: [{ translateY: sectionsTranslateY }],
+            }
+          ]}
+        >
           <Text style={styles.sectionTitle}>POPULAR STORIES</Text>
           <ScrollView 
             horizontal 
@@ -255,10 +367,18 @@ export default function HomeScreen() {
               );
             })}
           </ScrollView>
-        </View>
+        </Animated.View>
 
         {/* Recommended For You Section */}
-        <View style={styles.section}>
+        <Animated.View 
+          style={[
+            styles.section,
+            {
+              opacity: sectionsOpacity,
+              transform: [{ translateY: sectionsTranslateY }],
+            }
+          ]}
+        >
           <Text style={styles.sectionTitle}>RECOMMENDED FOR YOU</Text>
           <ScrollView 
             horizontal 
@@ -280,10 +400,18 @@ export default function HomeScreen() {
               />
             ))}
           </ScrollView>
-        </View>
+        </Animated.View>
 
         {/* Trending Now Section */}
-        <View style={styles.section}>
+        <Animated.View 
+          style={[
+            styles.section,
+            {
+              opacity: sectionsOpacity,
+              transform: [{ translateY: sectionsTranslateY }],
+            }
+          ]}
+        >
           <Text style={styles.sectionTitle}>TRENDING NOW</Text>
           <ScrollView 
             horizontal 
@@ -305,10 +433,18 @@ export default function HomeScreen() {
               />
             ))}
           </ScrollView>
-        </View>
+        </Animated.View>
 
         {/* New Releases Section */}
-        <View style={styles.section}>
+        <Animated.View 
+          style={[
+            styles.section,
+            {
+              opacity: sectionsOpacity,
+              transform: [{ translateY: sectionsTranslateY }],
+            }
+          ]}
+        >
           <Text style={styles.sectionTitle}>NEW RELEASES</Text>
           <ScrollView 
             horizontal 
@@ -330,10 +466,18 @@ export default function HomeScreen() {
               />
             ))}
           </ScrollView>
-        </View>
+        </Animated.View>
 
         {/* Short Reads Section */}
-        <View style={styles.section}>
+        <Animated.View 
+          style={[
+            styles.section,
+            {
+              opacity: sectionsOpacity,
+              transform: [{ translateY: sectionsTranslateY }],
+            }
+          ]}
+        >
           <Text style={styles.sectionTitle}>SHORT READS</Text>
           <ScrollView 
             horizontal 
@@ -355,10 +499,18 @@ export default function HomeScreen() {
               />
             ))}
           </ScrollView>
-        </View>
+        </Animated.View>
 
         {/* Saved Stories Section */}
-        <View style={styles.section}>
+        <Animated.View 
+          style={[
+            styles.section,
+            {
+              opacity: sectionsOpacity,
+              transform: [{ translateY: sectionsTranslateY }],
+            }
+          ]}
+        >
           <Text style={styles.sectionTitle}>SAVED STORIES</Text>
           <ScrollView 
             horizontal 
@@ -380,7 +532,7 @@ export default function HomeScreen() {
               />
             ))}
           </ScrollView>
-        </View>
+        </Animated.View>
       </ScrollView>
     </View>
   );
