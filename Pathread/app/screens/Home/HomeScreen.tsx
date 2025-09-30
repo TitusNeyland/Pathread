@@ -4,8 +4,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { homeStyles as styles } from './styles/home.styles';
 import { StoryCard } from './components/StoryCard';
+import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
+  const router = useRouter();
   // Animation values
   const headerOpacity = useRef(new Animated.Value(0)).current;
   const headerTranslateY = useRef(new Animated.Value(-30)).current;
@@ -220,7 +222,7 @@ export default function HomeScreen() {
             />
             <StoryCard
               title={`BEGIN A${'\n'}NEW STORY`}
-              onPress={() => handleStoryPress('Begin a New Story')}
+              onPress={() => router.push('/story-type' as any)}
               isNewStory={true}
             />
           </ScrollView>
