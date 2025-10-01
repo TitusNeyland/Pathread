@@ -57,7 +57,7 @@ export default function StoryTypeScreen() {
 
   const onContinue = () => {
     if (!selected) return;
-    router.push({ pathname: '/character', params: { genre: selected } });
+    router.push({ pathname: '/tone-length', params: { genre: selected } });
   };
 
   // Animation effect when component mounts
