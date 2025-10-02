@@ -4,8 +4,15 @@ import { Fonts } from '@/constants/theme';
 export const storyTypeStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0B1020',
+    backgroundColor: '#000000',
     paddingTop: 100,
+  },
+  background: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   scrollContainer: {
     flex: 1,
@@ -16,8 +23,9 @@ export const storyTypeStyles = StyleSheet.create({
   heading: {
     color: '#FFFFFF',
     fontSize: 36,
-    fontWeight: '800',
+    fontWeight: '700',
     textAlign: 'center',
+    fontFamily: Fonts.rounded,
   },
   subheading: {
     color: '#A9B0C6',

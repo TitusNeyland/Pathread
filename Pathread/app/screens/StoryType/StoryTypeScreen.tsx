@@ -178,7 +178,16 @@ export default function StoryTypeScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+      
+      {/* Background gradient to match other screens */}
+      <LinearGradient
+        colors={["rgba(78, 84, 200, 0.25)", "rgba(143, 148, 251, 0.10)", 'rgba(0,0,0,0.6)']}
+        start={{ x: 0.1, y: 0 }}
+        end={{ x: 0.9, y: 1 }}
+        style={styles.background}
+        pointerEvents="none"
+      />
       <ScrollView 
         style={styles.scrollContainer}
         contentContainerStyle={styles.scrollContent}
