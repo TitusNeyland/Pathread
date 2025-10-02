@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StatusBar, Animated, ScrollView, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Fonts } from '@/constants/theme';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 type LengthOption = 'short' | 'medium' | 'long';
@@ -92,7 +93,11 @@ export default function ToneLengthScreen() {
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.9}
-      style={[styles.option, active && styles.optionActive]}
+      style={[
+        styles.option,
+        active && styles.optionActive,
+        active && { transform: [{ scale: 1.03 }] }
+      ]}
     >
       <Text style={styles.optionText}>{label}</Text>
     </TouchableOpacity>
@@ -100,7 +105,16 @@ export default function ToneLengthScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="light-content" backgroundColor="#000000" />
+
+      {/* Background gradient to match other screens */}
+      <LinearGradient
+        colors={["rgba(78, 84, 200, 0.25)", "rgba(143, 148, 251, 0.10)", 'rgba(0,0,0,0.6)']}
+        start={{ x: 0.1, y: 0 }}
+        end={{ x: 0.9, y: 1 }}
+        style={styles.background}
+        pointerEvents="none"
+      />
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -110,6 +124,7 @@ export default function ToneLengthScreen() {
           style={{ opacity: headerOpacity, transform: [{ translateY: headerTranslateY }] }}
         >
           <Text style={styles.heading}>Customize your story</Text>
+          <Text style={styles.subheading}>Choose your preferences to create the perfect story</Text>
         </Animated.View>
 
         <Animated.View style={[styles.sections, { opacity: sectionsOpacity }] }>
@@ -206,9 +221,15 @@ export default function ToneLengthScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0B1020',
+    backgroundColor: '#000000',
     paddingTop: 90,
-    paddingHorizontal: 20,
+  },
+  background: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   scroll: {
     flex: 1,
@@ -219,14 +240,17 @@ const styles = StyleSheet.create({
   heading: {
     color: '#FFFFFF',
     fontSize: 36,
-    fontWeight: '800',
+    fontWeight: '700',
     textAlign: 'center',
+    fontFamily: Fonts.rounded,
+    paddingHorizontal: 40,
   },
   subheading: {
     color: '#A9B0C6',
     fontSize: 18,
     textAlign: 'center',
     marginTop: 8,
+    paddingHorizontal: 40,
   },
   sections: {
     marginTop: 38,
@@ -236,6 +260,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     letterSpacing: 2,
     marginBottom: 12,
+    marginLeft: 20,
+    fontFamily: Fonts.sans,
   },
   rowWrap: {
     flexDirection: 'row',
@@ -244,30 +270,31 @@ const styles = StyleSheet.create({
   horizontalRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingRight: 20,
+    paddingHorizontal: 20,
   },
   option: {
-    paddingVertical: 22,
-    paddingHorizontal: 28,
-    borderRadius: 18,
+    paddingVertical: 16,
+    paddingHorizontal: 22,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
     backgroundColor: 'rgba(255,255,255,0.04)',
-    marginRight: 14,
-    marginBottom: 14,
+    marginRight: 12,
+    marginBottom: 12,
   },
   optionActive: {
-    borderWidth: 2,
-    borderColor: '#3D63FF',
-    shadowColor: '#3D63FF',
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
-    elevation: 4,
+    borderWidth: 3,
+    borderColor: '#7B68EE',
+    shadowColor: '#7B68EE',
+    shadowOpacity: 0.7,
+    shadowRadius: 10,
+    elevation: 6,
   },
   optionText: {
     color: '#FFFFFF',
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '700',
+    fontFamily: Fonts.sans,
   },
   ctaWrapper: {
     position: 'absolute',
