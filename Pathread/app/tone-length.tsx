@@ -74,7 +74,7 @@ export default function ToneLengthScreen() {
 
   const onContinue = () => {
     if (!length) return;
-    router.push({ pathname: '/character', params: { genre, length, tone, perspective, difficulty } });
+    router.push({ pathname: '/pick-your-story', params: { genre, length, tone, perspective, difficulty } });
   };
 
   const SectionLabel = ({ text }: { text: string }) => (
