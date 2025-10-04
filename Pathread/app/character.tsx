@@ -1,2 +1,3 @@
-// Re-export the CharacterScreen
-export { default } from './screens/Character/CharacterScreen';
+import CharacterScreen from './screens/Character/CharacterScreen';
+
+export default CharacterScreen;
