@@ -84,8 +84,18 @@ export default function PickYourStoryScreen() {
 
   const onContinue = () => {
     if (!selectedStory) return;
-    // TODO: Navigate to story reader or next step
-    console.log('Selected story:', selectedStory);
+    // Navigate to loading screen to generate the story with parameters
+    router.push({
+      pathname: '/story-loading' as any,
+      params: {
+        storyId: selectedStory,
+        genre,
+        length,
+        tone,
+        perspective,
+        difficulty,
+      },
+    });
   };
 
   const handleSelect = useCallback((id: string) => {

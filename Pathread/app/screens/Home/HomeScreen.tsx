@@ -19,7 +19,8 @@ export default function HomeScreen() {
 
   const handleStoryPress = (storyTitle: string) => {
     console.log(`Opening story: ${storyTitle}`);
-    // TODO: Navigate to story reader
+    // Navigate to loading screen to generate/load the story
+    router.push('/story-loading' as any);
   };
 
   const handleProfilePress = () => {
