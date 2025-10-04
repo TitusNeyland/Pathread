@@ -6,7 +6,7 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useSplashScreen } from '@/hooks/use-splash-screen';
-import SplashScreenComponent from '@/components/splash-screen';
+import SplashScreenComponent from '@/app/screens/SplashScreen/SplashScreen';
 
 // Removed anchor to ensure login is the initial screen
 
@@ -41,7 +41,6 @@ export default function RootLayout() {
         <Stack.Screen name="story-type" options={{ headerShown: false }} />
         <Stack.Screen name="tone-length" options={{ headerShown: false }} />
         <Stack.Screen name="pick-your-story" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
