@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { Fonts } from '@/constants/theme';
+import { Fonts } from '../../../../constants/theme';
 
 export const storyTypeStyles = StyleSheet.create({
   container: {
