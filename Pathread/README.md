@@ -1,20 +1,42 @@
-# Welcome to your Expo app 👋
+# Pathread - AI Story Generator 📚
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This is an [Expo](https://expo.dev) project for an AI-powered interactive story generation app. Users can create personalized stories with different genres, tones, and lengths using OpenAI's GPT models.
 
-## Get started
+## Features
 
-1. Install dependencies
+- 🎭 Interactive story selection
+- 🤖 AI-powered story generation using OpenAI GPT
+- 🎨 Beautiful, animated UI with smooth transitions
+- 📱 Cross-platform support (iOS, Android, Web)
+- ⚙️ Customizable story parameters (genre, tone, length, etc.)
 
-   ```bash
-   npm install
-   ```
+## Setup
 
-2. Start the app
+### 1. Install dependencies
 
-   ```bash
-   npx expo start
-   ```
+```bash
+npm install
+```
+
+### 2. Configure OpenAI API Key
+
+To enable AI story generation, you need to set up your OpenAI API key:
+
+1. Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys)
+2. Create a `.env` file in the root directory (copy from `env.example`)
+3. Add your API key:
+
+```bash
+EXPO_PUBLIC_OPENAI_API_KEY=your-actual-api-key-here
+```
+
+**Important:** Never commit your actual API key to version control. The `.env` file should be in your `.gitignore`.
+
+### 3. Start the app
+
+```bash
+npx expo start
+```
 
 In the output, you'll find options to open the app in a
 
