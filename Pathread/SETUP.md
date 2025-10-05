@@ -13,17 +13,13 @@
 Create a `.env` file in the root directory (`Pathread/`) with:
 
 ```bash
-EXPO_PUBLIC_OPENAI_API_KEY=REDACTED
+EXPO_PUBLIC_OPENAI_API_KEY=your-openai-api-key-here
 ```
 
 ### Option B: Direct Configuration
-Edit `constants/config.ts` and replace:
+Edit `constants/config.ts` and ensure it uses the environment variable, not a hardcoded key:
 ```typescript
-API_KEY: process.env.EXPO_PUBLIC_OPENAI_API_KEY || 'REDACTED',
-```
-with:
-```typescript
-API_KEY: 'REDACTED',
+API_KEY: process.env.EXPO_PUBLIC_OPENAI_API_KEY || 'your-openai-api-key-here'
 ```
 
 ## 3. Restart the App

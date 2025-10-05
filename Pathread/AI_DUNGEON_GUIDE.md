@@ -26,7 +26,7 @@ Your Pathread app now has a fully functional AI Dungeon-style story generation s
 1. Get your OpenAI API key from [OpenAI Platform](https://platform.openai.com/api-keys)
 2. Create a `.env` file in the root directory:
    ```bash
-   EXPO_PUBLIC_OPENAI_API_KEY=REDACTED
+   EXPO_PUBLIC_OPENAI_API_KEY=your-openai-api-key-here
    ```
 3. Restart the app: `npx expo start --clear`
 

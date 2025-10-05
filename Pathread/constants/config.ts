@@ -3,7 +3,7 @@ export const CONFIG = {
   // OpenAI API configuration
   OPENAI: {
     // Replace with your actual OpenAI API key
-    API_KEY: process.env.EXPO_PUBLIC_OPENAI_API_KEY || 'REDACTED',
+    API_KEY: process.env.EXPO_PUBLIC_OPENAI_API_KEY || 'your-openai-api-key-here',
     MODEL: process.env.EXPO_PUBLIC_OPENAI_MODEL || 'gpt-4', // GPT-4 for better story quality
     MAX_TOKENS: parseInt(process.env.EXPO_PUBLIC_OPENAI_MAX_TOKENS || '1500'),
     TEMPERATURE: 0.8,
