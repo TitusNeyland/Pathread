@@ -51,7 +51,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       body: JSON.stringify({
         model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a creative interactive storyteller. Always return valid JSON.' },
+          { role: 'system', content: 'You are a creative interactive storyteller. Always return valid JSON .' },
           { role: 'user', content: prompt },
         ],
         max_tokens: Number(process.env.OPENAI_MAX_TOKENS || '1200'),
