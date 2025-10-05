@@ -25,6 +25,16 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
+## Backend endpoint for story generation
+
+This app expects a backend endpoint to avoid exposing the OpenAI API key on the client. Configure the base URL via an environment variable:
+
+```bash
+EXPO_PUBLIC_API_BASE_URL=https://YOUR_CLOUD_FUNCTION_URL
+```
+
+In Expo, you can set this in `.env` and load with [`@expo/config-plugins`](https://docs.expo.dev/guides/environment-variables/) or `expo-constants`. The client reads `process.env.EXPO_PUBLIC_API_BASE_URL`.
+
 ## Get a fresh project
 
 When you're ready, run:

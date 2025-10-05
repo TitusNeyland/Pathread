@@ -41,6 +41,7 @@ export default function RootLayout() {
         <Stack.Screen name="story-type" options={{ headerShown: false }} />
         <Stack.Screen name="tone-length" options={{ headerShown: false }} />
         <Stack.Screen name="pick-your-story" options={{ headerShown: false }} />
+        <Stack.Screen name="story-reader" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
