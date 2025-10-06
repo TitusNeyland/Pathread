@@ -17,7 +17,7 @@ export const characterStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 40,
+    paddingTop: 80,
     paddingBottom: 20,
     minHeight: '100%',
   },

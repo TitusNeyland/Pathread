@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 type GeneratePayload = {
   hookId: string;
+  hookDescription?: string;
   genre?: string;
   length?: string;
   tone?: string;
@@ -33,7 +34,7 @@ export default function StoryReaderScreen() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const apiBaseUrl = useMemo(() => process.env.EXPO_PUBLIC_API_BASE_URL || '', []);
+  const apiBaseUrl = useMemo(() => 'https://api-tbx2d52hwq-uc.a.run.app', []);
 
   useEffect(() => {
     let isMounted = true;
