@@ -27,21 +27,28 @@ export default function CharacterScreen() {
   const buttonTranslateY = useRef(new Animated.Value(20)).current;
 
   useEffect(() => {
-    // Simulate AI generation time
+    // Generate AI-powered character bio
     const generateBio = async () => {
       if (!zodiacSign || !interests || !firstName) return;
       
       setIsLoading(true);
       
-      // Parse interests from JSON string
-      const interestsArray = JSON.parse(interests);
-      
-      // Simulate processing time for AI generation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const bio = generateCharacterBio(zodiacSign, interestsArray, firstName);
-      setCharacterBio(bio);
-      setIsLoading(false);
+      try {
+        // Parse interests from JSON string
+        const interestsArray = JSON.parse(interests);
+        
+        // Generate AI-powered bio using the user's actual data
+        const bio = await generateCharacterBio(zodiacSign, interestsArray, firstName);
+        setCharacterBio(bio);
+      } catch (error) {
+        console.error('Error generating character bio:', error);
+        // Fallback will be handled by the bio generator
+        const interestsArray = JSON.parse(interests);
+        const bio = await generateCharacterBio(zodiacSign, interestsArray, firstName);
+        setCharacterBio(bio);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     generateBio();
