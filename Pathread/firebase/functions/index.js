@@ -24,11 +24,45 @@ app.post('/generateStory', async (req, res) => {
     const completion = await client.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
-        { role: 'system', content: 'You are a vivid, tasteful fiction writer. Keep it PG-13.' },
-        { role: 'user', content: prompt },
+        {
+          role: 'system',
+          content: `
+      You are a MASTER FICTION WRITER renowned for crafting immersive, emotionally rich narratives where every decision carries weight and consequence.
+      
+      Your task is to GENERATE a segment of an ongoing interactive fiction story where the protagonist encounters a high-stakes dilemma.
+      
+      Each segment must conclude with a CHOICE POINT, encouraging the user to make a difficult decision that significantly alters the story path.
+      
+      Write a concise story passage (max 250 words) that builds tension and leads naturally to a difficult decision. Include vivid imagery, emotional stakes, and internal conflict. Keep the story PG-13.
+      
+      End the story at a suspenseful moment where the character must make a choice, but do NOT include the actual choice options - those will be handled separately.
+      
+      Input variables:
+      - {previous_segment} — story so far
+      - {genre} — e.g., sci-fi, fantasy, noir
+      - {tone} — e.g., suspenseful, mysterious
+      - {main_character} — name + key traits
+      
+      Only return the story segment. Do not include any questions or choices.
+      The story should end on a suspenseful decision point, but let the UI handle the actual choices.
+      
+      Your storytelling determines user engagement. You are the emotional architect of this experience. Make every decision feel pivotal.
+          `.trim()
+        },
+        {
+          role: 'user',
+          content: `
+      {previous_segment}: The last story segment goes here.
+      
+      Genre: {genre}  
+      Tone: {tone}  
+      Main Character: {main_character}
+          `.trim()
+        }
       ],
+      
       temperature: 0.85,
-      max_tokens: 900,
+      max_tokens: 400,
     });
 
     const story = completion.choices?.[0]?.message?.content || '';
@@ -103,6 +137,83 @@ app.post('/generateStoryHooks', async (req, res) => {
   }
 });
 
+app.post('/generateChoices', async (req, res) => {
+  try {
+    const { storyContext, genre, firstName } = req.body || {};
+    console.log('generateChoices called with:', { storyContext: storyContext?.substring(0, 100) + '...', genre, firstName });
+    
+    if (!storyContext) {
+      console.error('Missing storyContext');
+      return res.status(400).json({ error: 'storyContext is required' });
+    }
+
+    const prompt = buildChoicesPrompt({ storyContext, genre, firstName });
+    console.log('Generated prompt:', prompt);
+
+    const client = new OpenAI({ apiKey: OPENAI_API_KEY.value() || process.env.OPENAI_API_KEY });
+    const completion = await client.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'You are a creative story choice generator. Respond only with valid JSON. Do not use markdown formatting or code blocks. Be concise.' },
+        { role: 'user', content: prompt },
+      ],
+      temperature: 0.8,
+      max_tokens: 200,
+    });
+
+    let choices = completion.choices?.[0]?.message?.content || '';
+    console.log('AI response:', choices);
+    
+    // Clean up markdown formatting if present
+    const jsonMatch = choices.match(/```json\s*([\s\S]*?)\s*```/);
+    if (jsonMatch) {
+      choices = jsonMatch[1];
+      console.log('Extracted JSON from markdown:', choices);
+    }
+    
+    // Try to validate the JSON response
+    try {
+      const parsed = JSON.parse(choices);
+      console.log('Parsed choices successfully:', parsed);
+    } catch (parseErr) {
+      console.error('AI response is not valid JSON:', parseErr);
+    }
+    
+    return res.json({ choices });
+  } catch (err) {
+    console.error('Error in generateChoices:', err);
+    return res.status(500).send(typeof err?.message === 'string' ? err.message : 'Internal error');
+  }
+});
+
+app.post('/continueStory', async (req, res) => {
+  try {
+    const { storyContext, choice, genre, firstName } = req.body || {};
+    if (!storyContext || !choice) {
+      return res.status(400).json({ error: 'storyContext and choice are required' });
+    }
+
+    const prompt = buildContinueStoryPrompt({ storyContext, choice, genre, firstName });
+
+    const client = new OpenAI({ apiKey: OPENAI_API_KEY.value() || process.env.OPENAI_API_KEY });
+    const completion = await client.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: 'You are a vivid, tasteful fiction writer. Keep it PG-13. Write in third person using the character\'s name. Be concise. Only return the story continuation - do not include any choice options.' },
+        { role: 'user', content: prompt },
+      ],
+      temperature: 0.85,
+      max_tokens: 250,
+    });
+
+    const story = completion.choices?.[0]?.message?.content || '';
+    return res.json({ story });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send(typeof err?.message === 'string' ? err.message : 'Internal error');
+  }
+});
+
 function buildPrompt({ hookId, genre, length, tone, perspective, difficulty, hookDescription }) {
   // Use the provided hook description if available, otherwise fall back to hardcoded hooks
   const hookMap = {
@@ -114,7 +225,7 @@ function buildPrompt({ hookId, genre, length, tone, perspective, difficulty, hoo
   const hook = hookDescription || hookMap[hookId] || 'A compelling mysterious opening.';
 
   const desiredLength =
-    length === 'short' ? 'about 400-600 words' : length === 'long' ? 'about 900-1200 words' : 'about 700-900 words';
+    length === 'short' ? 'about 200-300 words' : length === 'long' ? 'about 400-500 words' : 'about 300-400 words';
 
   const style = [
     genre ? `genre: ${genre}` : null,
@@ -125,10 +236,10 @@ function buildPrompt({ hookId, genre, length, tone, perspective, difficulty, hoo
     .filter(Boolean)
     .join(', ');
 
-  return `Write an original short story ${desiredLength}.
-Opening hook: ${hook}
-Style constraints: ${style || 'your best crowd-pleasing style'}
-Avoid graphic content; keep it suitable for teens. Use clear paragraphs.`;
+  return `Write a short story opening ${desiredLength}.
+Hook: ${hook}
+Style: ${style || 'engaging and accessible'}
+Keep it PG-13, concise, and end with a decision point for the character.`;
 }
 
 function buildCharacterBioPrompt({ firstName, zodiacSign, interests }) {
@@ -290,6 +401,37 @@ function parseCharacterBioResponse(bioContent, firstName, zodiacSign) {
     tags: ['Authentic', 'Genuine', 'Unique'],
     backstory: `${firstName} has always been known for their ${zodiacSign.toLowerCase()} nature, bringing their unique perspective to their interests and experiences. Their journey has been shaped by their natural personality traits and the meaningful connections they've made along the way.`
   };
+}
+
+function buildChoicesPrompt({ storyContext, genre, firstName }) {
+  const genreContext = genre ? `Genre: ${genre}. ` : '';
+  
+  return `Create 3 contextual choices for ${firstName} based on this story situation:
+
+"${storyContext}"
+
+${genreContext}Generate 3 different action choices that make sense in this specific situation. Each choice should be 2-4 words and lead to different story outcomes.
+
+Respond with JSON:
+{
+  "choices": [
+    {"id": "1", "text": "Specific action", "icon": "appropriate-icon", "gradient": ["#color1", "#color2"]},
+    {"id": "2", "text": "Different action", "icon": "appropriate-icon", "gradient": ["#color1", "#color2"]},
+    {"id": "3", "text": "Alternative action", "icon": "appropriate-icon", "gradient": ["#color1", "#color2"]}
+  ]
+}
+
+Icons: compass-outline, eye-outline, hand-left-outline, shield-outline, search-outline, key-outline, star-outline, chatbubble-outline, flash-outline, home-outline, ear-outline, sword-outline, heart-outline, brain-outline, lightning-outline, moon-outline, sun-outline, fire-outline, water-outline, earth-outline, wind-outline.`;
+}
+
+function buildContinueStoryPrompt({ storyContext, choice, genre, firstName }) {
+  const genreContext = genre ? `Genre: ${genre}. ` : '';
+  
+  return `Continue story: "${storyContext}"
+
+${firstName} chose: "${choice}"
+
+${genreContext}Write 2-3 sentences showing the consequences of this choice. Do not include ">>" formatting - just write the story continuation. Keep it PG-13 and engaging.`;
 }
 
 export const api = onRequest({ region: 'us-central1', secrets: [OPENAI_API_KEY] }, app);
